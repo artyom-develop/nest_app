@@ -1,6 +1,5 @@
-import { Not } from './../../node_modules/expect-type/dist/utils.d';
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { TaskInterface } from '../types/Task';
+import { TaskInterface } from '../../../types/Task.interface';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 
@@ -22,6 +21,7 @@ export class TaskService {
   findAll(): TaskInterface[] {
     return this.tasks;
   }
+
   findById(id: number): TaskInterface {
     const foundItem = this.tasks.find((task) => task.id === id);
 
@@ -33,11 +33,14 @@ export class TaskService {
   }
 
   createTask(dto: CreateTaskDto): TaskInterface[] {
-    const { title } = dto;
-
-    const newTask = {
+    const { title, description, priority, tags, webSiteUrl } = dto;
+    const newTask: TaskInterface = {
       id: this.tasks.length + 1,
       title,
+      priority,
+      description,
+      tags,
+      webSiteUrl,
       isCompleted: false,
     };
 
@@ -60,6 +63,7 @@ export class TaskService {
     Object.assign(task, dto);
     return task;
   }
+
   deleteTaskById(id: number) {
     const foundTask = this.findById(id);
     this.tasks = this.tasks.filter((task) => task.id !== foundTask.id);
