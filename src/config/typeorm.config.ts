@@ -15,4 +15,4 @@ export function getTypeOrmConfig(): TypeOrmModuleAsyncOptions {
     }),
     inject: [ConfigService],
   };
-}
+} 

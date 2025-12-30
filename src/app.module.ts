@@ -6,6 +6,8 @@ import { TaskModule } from './api/tasks/task/task.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { getTypeOrmConfig } from './config/typeorm.config';
+import { ReviewModule } from './api/review/review.module';
+import { ActorModule } from './api/actor/actor.module';
 
 @Module({
   imports: [
@@ -16,6 +18,8 @@ import { getTypeOrmConfig } from './config/typeorm.config';
     TypeOrmModule.forRootAsync(getTypeOrmConfig()),
     TaskModule,
     MovieModule,
+    ReviewModule,
+    ActorModule,
   ],
   controllers: [AppController],
   providers: [AppService],

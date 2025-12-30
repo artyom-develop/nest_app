@@ -1,19 +1,28 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { MovieDto } from './dto/movie.dto';
 import { MovieEntity } from './entites/movie.entity';
 import { DefaultType } from '../../types/DefaultType';
+import { ActorEntity } from '../actor/entities/actor.entity';
+import { MoviePosterEntity } from './entites/poster.entity';
 
 @Injectable()
 export class MovieService {
   constructor(
     @InjectRepository(MovieEntity)
     private readonly movieRepository: Repository<MovieEntity>,
+    @InjectRepository(ActorEntity)
+    private readonly actorRepository: Repository<ActorEntity>,
+    @InjectRepository(MoviePosterEntity)
+    private readonly posterRepository: Repository<MoviePosterEntity>,
   ) {}
 
   async findAll(): Promise<MovieEntity[]> {
     return await this.movieRepository.find({
+      where: {
+        isAvailable: true,
+      },
       order: {
         createdAt: 'desc',
       },
@@ -22,10 +31,10 @@ export class MovieService {
       select: {
         id: true,
         title: true,
-        rating: true,
-        genre: true,
         releaseYear: true,
+        createdAt: true,
       },
+      relations: ['reviews', 'actors', 'poster'],
     });
   }
 
@@ -38,7 +47,10 @@ export class MovieService {
         id: true,
         title: true,
         releaseYear: true,
+        description: true,
+        createdAt: true,
       },
+      relations: ['reviews', 'actors', 'poster'],
     });
     if (!movie) {
       throw new NotFoundException('Фильм не найден');
@@ -46,7 +58,28 @@ export class MovieService {
     return movie;
   }
   async create(dto: MovieDto): Promise<MovieEntity> {
-    const movie = this.movieRepository.create(dto);
+    const { title, releaseYear, actorIds, imageUrl } = dto;
+
+    const actors = await this.actorRepository.find({
+      where: {
+        id: In(actorIds),
+      },
+    });
+    if (!actors || !actors.length) {
+      throw new NotFoundException('Актеры не найдены');
+    }
+
+    let poster: MoviePosterEntity | null = null;
+    if (imageUrl) {
+      poster = this.posterRepository.create({ imageUrl });
+      await this.posterRepository.save(poster);
+    }
+    const movie = this.movieRepository.create({
+      title,
+      releaseYear,
+      poster,
+      actors,
+    });
 
     return await this.movieRepository.save(movie);
   }
