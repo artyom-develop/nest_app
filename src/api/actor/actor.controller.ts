@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { ActorService } from './actor.service';
 import { CreateActorDto } from './dto/actor.dto';
-import { UpdateActorDto } from './dto/update-actor.dto'
+import { UpdateActorDto } from './dto/update-actor.dto';
 
 @Controller('actors')
 export class ActorController {

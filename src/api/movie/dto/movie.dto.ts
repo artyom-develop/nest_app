@@ -2,6 +2,9 @@ import {
   IsArray,
   IsInt,
   IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsPositive,
   IsString,
   IsUrl,
   IsUUID,
@@ -20,12 +23,18 @@ export class MovieDto {
   @Max(new Date().getFullYear())
   releaseYear: number;
 
+  @IsNumber()
+  @Min(0)
+  @Max(10)
+  @IsPositive()
+  @IsOptional()
+  rating: number;
+
   @IsArray()
   @IsUUID('4', { each: true })
   actorIds: string[];
 
-
   @IsString()
   @IsUrl()
-  imageUrl:string;
+  imageUrl: string;
 }

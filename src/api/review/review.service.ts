@@ -1,34 +1,39 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { MovieService } from '../movie/movie.service';
+import { PrismaService } from '../../core/prisma/prisma.service';
 import { CreateReviewDto } from './dto/create-review.dto';
+import { Review } from '@prisma/client';
 import { PatchReviewDto } from './dto/patch-review.dto';
-import { ReviewEntity } from './entities/review.entity';
+import { DefaultType } from '../../types/DefaultType';
 
 @Injectable()
 export class ReviewService {
-  constructor(
-    @InjectRepository(ReviewEntity)
-    private reviewRepository: Repository<ReviewEntity>,
-    private movieService: MovieService,
-  ) {}
+  constructor(private readonly prismaService: PrismaService) {}
 
-  async createReviews(dto: CreateReviewDto): Promise<ReviewEntity> {
+  async createReviews(dto: CreateReviewDto): Promise<Review> {
     const { text, rating, movieId } = dto;
-    const movie = await this.movieService.findMovieById(movieId);
-
-    const review = this.reviewRepository.create({
-      text,
-      rating,
-      movie,
+    const movie = await this.prismaService.movie.findUnique({
+      where: { id: movieId },
     });
-    await this.reviewRepository.save(review);
+    if (!movie) {
+      throw new NotFoundException('Фильм не найден');
+    }
+    const review = await this.prismaService.review.create({
+      data: {
+        text,
+        rating,
+        movie: {
+          connect: {
+            id: movieId,
+          },
+        },
+      },
+    });
+
     return review;
   }
 
-  async findReviewById(id: string): Promise<ReviewEntity> {
-    const review = await this.reviewRepository.findOne({
+  async findReviewById(id: string): Promise<Review> {
+    const review = await this.prismaService.review.findUnique({
       where: { id },
     });
 
@@ -38,21 +43,22 @@ export class ReviewService {
     return review;
   }
 
-  async patchReview(id: string, dto: PatchReviewDto) {
+  async patchReview(id: string, dto: PatchReviewDto): Promise<Review> {
     const review = await this.findReviewById(id);
 
-    Object.assign(review, dto);
-    await this.reviewRepository.save(review);
-
-    return {
-      error: false,
-      message: 'Отзыв успешно изменён',
-    };
+    return await this.prismaService.review.update({
+      where: { id },
+      data: {
+        ...dto,
+      },
+    });
   }
 
-  async deleteReview(id: string) {
+  async deleteReview(id: string): Promise<DefaultType> {
     const review = await this.findReviewById(id);
-    await this.reviewRepository.remove(review);
+    await this.prismaService.review.delete({
+      where: { id: review.id },
+    });
     return {
       error: false,
       message: 'Отзыв успешно удален',
