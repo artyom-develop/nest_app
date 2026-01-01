@@ -6,6 +6,7 @@ export class LoggingMiddleware implements NestMiddleware {
     console.log(
       `Request method: ${req.method} ${req.url} \n Body: ${req.body ? JSON.stringify(req.body) : 'No Body'}. Response: ${res.statusCode}`,
     );
+    
     next();
   }
 }
