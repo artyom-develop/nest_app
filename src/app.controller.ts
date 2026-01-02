@@ -1,4 +1,11 @@
-import { Controller } from '@nestjs/common';
+import { Body, Controller, Post, UsePipes } from '@nestjs/common';
+import { StringToLowercasePipe } from './shared/pipes/stringToLowercase.pipe';
 
-@Controller()
-export class AppController {}
+@Controller('app')
+export class AppController {
+  @UsePipes(StringToLowercasePipe)
+  @Post()
+  create(@Body('title') title: string) {
+    return `Movie ${title}`;
+  }
+}
