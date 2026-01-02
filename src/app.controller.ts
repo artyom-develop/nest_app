@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   Post,
+  UseFilters,
   UseGuards,
   UseInterceptors,
   UsePipes,
@@ -11,6 +12,7 @@ import { StringToLowercasePipe } from './shared/pipes/stringToLowercase.pipe';
 import { AuthGuard } from './shared/guards/auth.guard';
 import { UserAgent } from './shared/decotators/user-agent.decorator';
 import { ResponseInterceptor } from './core/interceptors/repsponse.interceptor';
+import { AllExceptionFilter } from './shared/filters/all-exception.filter'
 
 @Controller('app')
 export class AppController {
@@ -20,6 +22,7 @@ export class AppController {
     return `Movie ${title}`;
   }
 
+  @UseFilters(AllExceptionFilter)
   @UseGuards(AuthGuard)
   @Get('profile')
   getProfile(@UserAgent() userAgent: string) {
