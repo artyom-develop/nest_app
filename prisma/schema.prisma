@@ -7,7 +7,7 @@ datasource db {
 }
 
 enum Genre {
-  ACTION 
+  ACTION
   COMEDY
   DRAMA
   HORROR
