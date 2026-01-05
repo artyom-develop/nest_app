@@ -5,6 +5,7 @@ import {
   HttpException,
   Logger,
 } from '@nestjs/common';
+import { error } from 'console';
 import { type Response } from 'express';
 
 @Catch()
@@ -28,6 +29,7 @@ export class AllExceptionFilter implements ExceptionFilter {
     response.status(status).json({
       status,
       message,
+      error: true,
       timestamp: new Date().toISOString(),
       path: ctx.getRequest().url,
     });

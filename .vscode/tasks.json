@@ -1,0 +1,14 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "bun start",
+      "type": "shell",
+      "command": "bun",
+      "args": ["start"],
+      "runOptions": {
+        "runOn": "folderOpen"
+      }
+    }
+  ]
+}

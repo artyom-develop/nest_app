@@ -1,19 +1,22 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { In, Repository } from 'typeorm';
-import { MovieDto } from './dto/movie.dto';
+import { Movie } from '@prisma/client';
 import { PrismaService } from '../../core/prisma/prisma.service';
-import { Movie, MoviePoster } from '@prisma/client';
 import { DefaultType } from '../../types/DefaultType';
+import { MovieDtoRequest } from './dto/movie.dto'
+import { MovieResponse } from './response/movie.dto'
 
 @Injectable()
 export class MovieService {
   constructor(private prismaService: PrismaService) {}
 
-  async findAll() {
+  async findAll(releaseYear: number | {}) {
     return await this.prismaService.movie.findMany({
-      where: { isAvailable: true },
+      where: {
+        isAvailable: true,
+        releaseYear: releaseYear ? releaseYear : undefined,
+      },
       orderBy: { createdAt: 'desc' },
+
       // include: {
       //   actors: {
       //     select: {
@@ -28,6 +31,7 @@ export class MovieService {
         title: true,
         releaseYear: true,
         description: true,
+        genre: true,
         reviews: {
           select: {
             id: true,
@@ -68,8 +72,8 @@ export class MovieService {
     }
     return movie;
   }
-  async create(dto: MovieDto): Promise<Movie> {
-    const { title, releaseYear, actorIds, imageUrl } = dto;
+  async create(dto: MovieDtoRequest): Promise<Movie> {
+    const { title, releaseYear, actorIds, imageUrl, rating } = dto;
 
     const actors = await this.prismaService.actor.findMany({
       where: {
@@ -100,7 +104,7 @@ export class MovieService {
 
     return movie;
   }
-  async update(id: string, dto: MovieDto): Promise<DefaultType> {
+  async update(id: string, dto: MovieDtoRequest): Promise<DefaultType> {
     const foundMovie = await this.findMovieById(id);
 
     const actors = await this.prismaService.actor.findMany({
@@ -118,6 +122,7 @@ export class MovieService {
         title: dto.title,
         releaseYear: dto.releaseYear,
         rating: dto.rating ? dto.rating : foundMovie.rating,
+
         poster: dto.imageUrl
           ? {
               create: {

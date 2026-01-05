@@ -13,6 +13,7 @@ import { ReviewModule } from './api/review/review.module';
 import { ActorModule } from './api/actor/actor.module';
 import { PrismaModule } from './core/prisma/prisma.module';
 import { LoggingMiddleware } from './shared/middlewares/logger.middleware';
+import { MovieController } from './api/movie/movie.controller'
 
 @Module({
   imports: [
@@ -33,6 +34,6 @@ export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer
       .apply(LoggingMiddleware)
-      .forRoutes({ path: 'movies', method: RequestMethod.GET });
+      .forRoutes(MovieController);
   }
 }
