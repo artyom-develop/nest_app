@@ -1,19 +1,15 @@
-import {
-  MiddlewareConsumer,
-  Module,
-  NestModule,
-  RequestMethod,
-} from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { MovieModule } from './api/movie/movie.module';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { ReviewModule } from './api/review/review.module';
-import { ActorModule } from './api/actor/actor.module';
-import { PrismaModule } from './core/prisma/prisma.module';
-import { LoggingMiddleware } from './shared/middlewares/logger.middleware';
-import { MovieController } from './api/movie/movie.controller'
+
+import { PrismaModule } from './core/services/prisma/prisma.module';
+
+import { AuthUserModule } from './api/auth/auth.module';
+import { AuthModule } from './core/services/auth/auth.module';
+import { InvalidateTokenModule } from './core/services/invalidate-token/invalidate-token.module';
+import { PassportModule } from '@nestjs/passport';
 
 @Module({
   imports: [
@@ -21,19 +17,14 @@ import { MovieController } from './api/movie/movie.controller'
       isGlobal: true,
       expandVariables: true,
     }),
-    PrismaModule,
 
-    MovieModule,
-    ReviewModule,
-    ActorModule,
+    PrismaModule,
+    AuthModule,
+    AuthUserModule,
+    InvalidateTokenModule,
   ],
-  controllers: [AppController],
   providers: [AppService],
 })
 export class AppModule implements NestModule {
-  configure(consumer: MiddlewareConsumer) {
-    consumer
-      .apply(LoggingMiddleware)
-      .forRoutes(MovieController);
-  }
+  configure(consumer: MiddlewareConsumer) {}
 }

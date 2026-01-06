@@ -15,8 +15,22 @@ services:
       - postgres_data:/var/lib/postgresql
     networks:
       - nestjs-course
+
+  redis: # Добавлено
+    container_name: redis
+    image: redis:alpine
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    networks:
+      - nestjs-course
+
 volumes:
   postgres_data:
+  redis_data: # Добавлено
 
 networks:
   nestjs-course:
