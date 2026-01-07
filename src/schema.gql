@@ -1,0 +1,69 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type AuthModel {
+  accessToken: String!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+"""Login request payload"""
+input LoginRequest {
+  email: String!
+  password: String!
+}
+
+type LogoutModel {
+  error: Boolean!
+  message: String!
+}
+
+type Mutation {
+  login(data: LoginRequest!): AuthModel!
+  logout: LogoutModel!
+  refresh: AuthModel!
+  register(data: RegisterRequest!): AuthModel!
+}
+
+type Query {
+  """Get all users (Admin only)"""
+  getAll: [UserModel!]!
+  getMe: UserModel!
+  test: String!
+}
+
+"""Login request payload"""
+input RegisterRequest {
+  email: String!
+  name: String!
+  password: String!
+}
+
+"""User model representing a user in the system"""
+type UserModel {
+  createdAt: DateTime!
+
+  """The email of the user"""
+  email: String!
+  id: ID!
+
+  """The name of the user"""
+  name: String!
+
+  """The password of the user"""
+  password: String!
+
+  """The role of the user and admin"""
+  role: UserRole!
+  updatedAt: DateTime!
+}
+
+"""The role of the user"""
+enum UserRole {
+  ADMIN
+  USER
+}

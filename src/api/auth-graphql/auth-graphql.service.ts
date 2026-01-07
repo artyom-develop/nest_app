@@ -1,27 +1,26 @@
 import {
   ConflictException,
-  Injectable,
   NotFoundException,
+  Injectable,
 } from '@nestjs/common';
 import argon2 from 'argon2';
 import { PrismaService } from '../../core/services/prisma/prisma.service';
-import { RegisterRequest } from './dto/register.dto';
 
-import  { type Request, type Response } from 'express';
-import { LoginRequest } from './dto/login.dto';
+import e, { type Request, type Response } from 'express';
 
 import { AuthService } from '../../core/services/auth/auth.service';
-
+import { RegisterRequest } from './inputs/regester.input';
+import { LoginRequest } from './inputs/login.input';
 
 @Injectable()
-export class AuthUserService {
+export class AuthGraphqlService {
   constructor(
     private prismaService: PrismaService,
     private authService: AuthService,
   ) {}
 
-  async registerUser(res: Response, dto: RegisterRequest) {
-    const { name, email, password } = dto;
+  async registerUser(res: Response, input: RegisterRequest) {
+    const { name, email, password } = input;
 
     const existUser = await this.prismaService.user.findUnique({
       where: { email },
@@ -48,8 +47,8 @@ export class AuthUserService {
     return response;
   }
 
-  async LoginUser(res: Response, dto: LoginRequest) {
-    const { email, password } = dto;
+  async LoginUser(res: Response, input: LoginRequest) {
+    const { email, password } = input;
 
     const existUser = await this.prismaService.user.findUnique({
       where: { email },
@@ -100,19 +99,10 @@ export class AuthUserService {
     }
   }
 
-  async logoutUser(res: Response, req: Request) {
+  async logoutUser(req: Request, res: Response) {
     await this.authService.logout(res, req);
     return { message: 'Logout successful', error: false };
   }
 
-  async getUserById(id: string) {
-    const user = await this.prismaService.user.findUnique({
-      where: { id },
-    });
-
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
-    return user;
-  }
+ 
 }

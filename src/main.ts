@@ -10,7 +10,7 @@ async function bootstrap() {
   app.use(cookieParser());
   app.useGlobalPipes(new ValidationPipe());
   // app.useGlobalInterceptors(new ResponseInterceptor());
-  app.useGlobalFilters(new AllExceptionFilter());
+  // app.useGlobalFilters(new AllExceptionFilter());
 
   setupSwagger(app);
 

@@ -16,7 +16,7 @@ export class CookieService {
       domain: this.COOKIE_DOMAIN,
       expires,
       secure: !isDev(this.configService),
-      sameSite: isDev(this.configService) ? 'none' : 'lax',
+      sameSite: 'lax',
     });
   }
 
